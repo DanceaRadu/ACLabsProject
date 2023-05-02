@@ -1,9 +1,11 @@
 package com.aclabs.twitter.user;
 
 import com.aclabs.twitter.follow.Follow;
+import com.aclabs.twitter.like.Like;
 import com.aclabs.twitter.post.Post;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -24,20 +26,24 @@ public class User {
     private String password;
 
     @JsonManagedReference (value = "post")
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "poster")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "poster", cascade = CascadeType.REMOVE)
     private List<Post> posts;
 
     @JsonManagedReference (value = "followerReference")
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "follower")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "follower", cascade = CascadeType.REMOVE)
     private List<Follow> follows;
 
     @JsonManagedReference (value = "followedReference")
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "followed")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "followed", cascade = CascadeType.REMOVE)
     private List<Follow> followers;
+
+    @JsonManagedReference (value = "userLikeReference")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "liker", cascade = CascadeType.REMOVE)
+    private List<Like> likedPosts;
 
     public User() {}
 
-    public User(String username, String firstName, String lastName, String email, String password, List<Post> posts, List<Follow> follows, List<Follow> followers) {
+    public User(String username, String firstName, String lastName, String email, String password, List<Post> posts, List<Follow> follows, List<Follow> followers, List<Like> likedPosts) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -46,6 +52,7 @@ public class User {
         this.posts = posts;
         this.follows = follows;
         this.followers = followers;
+        this.likedPosts = likedPosts;
     }
 
     public User(String username) {this.username = username;}
@@ -95,4 +102,5 @@ public class User {
     }
 
     public List<Post> getPosts() { return posts; }
+
 }

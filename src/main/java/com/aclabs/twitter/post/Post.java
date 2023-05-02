@@ -1,11 +1,14 @@
 package com.aclabs.twitter.post;
 
+import com.aclabs.twitter.like.Like;
 import com.aclabs.twitter.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name="posts")
@@ -28,11 +31,16 @@ public class Post {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp postDate;
 
-    public Post(Long id, User poster, String message, Timestamp postDate) {
+    @JsonManagedReference(value = "postLikes")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Like> postLikes;
+
+    public Post(Long id, User poster, String message, Timestamp postDate, List<Like> postLikes) {
         this.id = id;
         this.poster = poster;
         this.message = message;
         this.postDate = postDate;
+        this.postLikes = postLikes;
     }
 
     public Post(Long id) {
