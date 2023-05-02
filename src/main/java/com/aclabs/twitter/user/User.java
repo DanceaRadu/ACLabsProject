@@ -1,9 +1,10 @@
 package com.aclabs.twitter.user;
 
+import com.aclabs.twitter.follow.Follow;
 import com.aclabs.twitter.post.Post;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,30 +22,33 @@ public class User {
     private String email;
     @Column(name="password", length=100, nullable=false)
     private String password;
-    @Column(name="salt", length=100, nullable=false)
-    private String salt;
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
-    @Column(name="posts")
+
+    @JsonManagedReference (value = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "poster")
     private List<Post> posts;
 
-    public User() {
+    @JsonManagedReference (value = "followerReference")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "follower")
+    private List<Follow> follows;
 
-    }
+    @JsonManagedReference (value = "followedReference")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "followed")
+    private List<Follow> followers;
 
-    public User(String username, String firstName, String lastName, String email, String password, String salt, List<Post> posts) {
+    public User() {}
+
+    public User(String username, String firstName, String lastName, String email, String password, List<Post> posts, List<Follow> follows, List<Follow> followers) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.salt = salt;
         this.posts = posts;
+        this.follows = follows;
+        this.followers = followers;
     }
 
-    public User(String username) {
-        this.username = username;
-    }
+    public User(String username) {this.username = username;}
 
     public void setUsername(String username) {
         this.username = username;
@@ -64,10 +68,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public void setPosts(List<Post> posts){
@@ -94,18 +94,5 @@ public class User {
         return password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void addPost(Post post) {
-        if(post != null) {
-            if(posts == null) posts = new ArrayList<>();
-            posts.add(post);
-        }
-    }
+    public List<Post> getPosts() { return posts; }
 }

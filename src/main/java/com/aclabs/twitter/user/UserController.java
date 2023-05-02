@@ -2,9 +2,9 @@ package com.aclabs.twitter.user;
 
 import com.aclabs.twitter.post.Post;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping(path = "search")
-    public ArrayList<User> search(@RequestParam String searchTerm) {
+    public List<User> search(@RequestParam String searchTerm) {
         return userService.search(searchTerm);
     }
 
@@ -33,8 +33,14 @@ public class UserController {
         userService.unregister(username);
     }
 
-    @GetMapping(path ="allusers")
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
+    @GetMapping(path = "{username}/getOwnPosts")
+    public List<Post> getOwnPosts(@PathVariable String username, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
+        return userService.getOwnPosts(username, filterTime);
     }
+
+    @GetMapping(path = "{username}/getFeed")
+    public List<List<Post>> getFollowedPosts(@PathVariable String username) {
+        return userService.getFeed(username);
+    }
+
 }
