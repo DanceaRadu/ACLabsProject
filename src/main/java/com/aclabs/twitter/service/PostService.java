@@ -1,5 +1,7 @@
-package com.aclabs.twitter.post;
+package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.model.Post;
+import com.aclabs.twitter.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

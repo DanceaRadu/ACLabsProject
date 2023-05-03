@@ -1,6 +1,8 @@
-package com.aclabs.twitter.user;
+package com.aclabs.twitter.controller;
 
-import com.aclabs.twitter.post.Post;
+import com.aclabs.twitter.model.Post;
+import com.aclabs.twitter.model.User;
+import com.aclabs.twitter.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;

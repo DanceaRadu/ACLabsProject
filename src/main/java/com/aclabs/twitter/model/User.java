@@ -1,11 +1,10 @@
-package com.aclabs.twitter.user;
+package com.aclabs.twitter.model;
 
-import com.aclabs.twitter.follow.Follow;
-import com.aclabs.twitter.like.Like;
-import com.aclabs.twitter.post.Post;
+import com.aclabs.twitter.model.Follow;
+import com.aclabs.twitter.model.Like;
+import com.aclabs.twitter.model.Post;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 

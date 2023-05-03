@@ -1,7 +1,9 @@
-package com.aclabs.twitter.user;
+package com.aclabs.twitter.service;
 
-import com.aclabs.twitter.follow.FollowRepository;
-import com.aclabs.twitter.post.Post;
+import com.aclabs.twitter.model.User;
+import com.aclabs.twitter.repository.FollowRepository;
+import com.aclabs.twitter.model.Post;
+import com.aclabs.twitter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

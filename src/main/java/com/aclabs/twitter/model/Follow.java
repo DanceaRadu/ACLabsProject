@@ -1,6 +1,5 @@
-package com.aclabs.twitter.follow;
+package com.aclabs.twitter.model;
 
-import com.aclabs.twitter.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 

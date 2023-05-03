@@ -1,5 +1,6 @@
-package com.aclabs.twitter.post;
+package com.aclabs.twitter.repository;
 
+import com.aclabs.twitter.model.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

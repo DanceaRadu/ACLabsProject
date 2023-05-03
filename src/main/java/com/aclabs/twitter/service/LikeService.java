@@ -1,5 +1,7 @@
-package com.aclabs.twitter.like;
+package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.model.Like;
+import com.aclabs.twitter.repository.LikeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

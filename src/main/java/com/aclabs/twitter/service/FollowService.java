@@ -1,5 +1,7 @@
-package com.aclabs.twitter.follow;
+package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.model.Follow;
+import com.aclabs.twitter.repository.FollowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
