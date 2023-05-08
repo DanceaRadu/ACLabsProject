@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "follow")
+@RequestMapping(path = "api/v1/follow")
 public class FollowController {
 
     private final FollowService followService;

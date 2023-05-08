@@ -14,10 +14,11 @@ import java.security.SecureRandom;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable().cors().disable();
         http.authorizeHttpRequests().anyRequest().permitAll();
-        http.csrf().disable();
         return http.build();
     }
 

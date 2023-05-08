@@ -5,6 +5,9 @@ import com.aclabs.twitter.repository.FollowRepository;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,7 @@ public class UserService {
     }
 
     public void register(User user) {
+        System.out.println(user.getPassword());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -35,19 +39,18 @@ public class UserService {
         return userRepository.findAll().stream().filter(e -> e.getFirstName().equals(searchTerm) || e.getLastName().equals(searchTerm) || e.getUsername().equals(searchTerm)).toList();
     }
 
-    public void unregister(String username) {
-        userRepository.deleteById(username);
+    public void unregister(Long userID) {
+        userRepository.deleteById(userID);
     }
 
-    public List<Post> getOwnPosts(String username, Date filterTime) {
+    public List<Post> getOwnPosts(Long userID, Date filterTime) {
         if(filterTime != null)
-            return userRepository.getReferenceById(username).getPosts().stream().filter(e -> e.getPostDate().after(filterTime)).toList();
+            return userRepository.getReferenceById(userID).getPosts().stream().filter(e -> e.getPostDate().after(filterTime)).toList();
         else
-            return userRepository.getReferenceById(username).getPosts();
+            return userRepository.getReferenceById(userID).getPosts();
     }
 
-    public List<List<Post>> getFeed(String username) {
-        return followRepository.findAll().stream().filter(e -> e.getFollower().getUsername().equals(username)).map(e -> e.getFollowed().getPosts()).toList();
+    public List<List<Post>> getFeed(Long userID) {
+        return followRepository.findAll().stream().filter(e -> e.getFollowerUser().getUserID().equals(userID)).map(e -> e.getFollowedUser().getPosts()).toList();
     }
-
 }

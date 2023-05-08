@@ -2,55 +2,24 @@ package com.aclabs.twitter.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "follows")
-public class Follow {
+public @Data class Follow {
 
     @Id
     @Column(name = "follow_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long followId;
+    private Long followID;
 
-    @JsonBackReference(value = "followerReference")
+    @JsonBackReference(value = "User followers")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_username", referencedColumnName = "username")
-    private User follower;
+    @JoinColumn(name = "follower_id", referencedColumnName = "user_id")
+    private User followerUser;
 
-    @JsonBackReference(value = "followedReference")
+    @JsonBackReference(value = "Followed users")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followed_username", referencedColumnName = "username")
-    private User followed;
-
-    public Follow(Long follow_id, User follower, User followed) {
-        this.followId = follow_id;
-        this.followed = followed;
-        this.follower = follower;
-    }
-
-    public Follow() {}
-
-    public Long getFollowId() {
-        return followId;
-    }
-
-    public void setFollowId(Long followId) {
-        this.followId = followId;
-    }
-
-    public User getFollower() {
-        return follower;
-    }
-
-    public void setFollower(User follower) {
-        this.follower = follower;
-    }
-
-    public User getFollowed() {
-        return followed;
-    }
-
-    public void setFollowed(User followed) {
-        this.followed = followed;
-    }
+    @JoinColumn(name = "followed_id", referencedColumnName = "user_id")
+    private User followedUser;
 }
