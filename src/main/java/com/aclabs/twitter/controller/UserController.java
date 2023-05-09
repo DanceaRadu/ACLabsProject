@@ -1,7 +1,5 @@
 package com.aclabs.twitter.controller;
 
-import com.aclabs.twitter.exceptionhandling.exceptions.NoQueryResultException;
-import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.service.UserService;
