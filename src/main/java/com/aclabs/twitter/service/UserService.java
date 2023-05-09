@@ -1,5 +1,8 @@
 package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.exceptionhandling.exceptions.NoQueryResultException;
+import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
+import com.aclabs.twitter.model.Follow;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.repository.FollowRepository;
 import com.aclabs.twitter.model.Post;
@@ -13,18 +16,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final FollowRepository followRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, FollowRepository followRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository =  userRepository;
-        this.followRepository = followRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,14 +38,19 @@ public class UserService {
     }
 
     public List<User> search(String searchTerm) {
-        return userRepository.findAll().stream().filter(e -> e.getFirstName().equals(searchTerm) || e.getLastName().equals(searchTerm) || e.getUsername().equals(searchTerm)).toList();
+        List<User> list =  userRepository.findUsersByUsernameContainsOrFirstNameContainsOrLastNameContains(searchTerm, searchTerm, searchTerm);
+        if(list.isEmpty()) throw new NoQueryResultException(searchTerm);
+        else return list;
     }
 
     public void unregister(Long userID) {
+        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         userRepository.deleteById(userID);
     }
 
     public List<Post> getOwnPosts(Long userID, Date filterTime) {
+
+        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         if(filterTime != null)
             return userRepository.getReferenceById(userID).getPosts().stream().filter(e -> e.getPostDate().after(filterTime)).toList();
         else
@@ -51,6 +58,8 @@ public class UserService {
     }
 
     public List<List<Post>> getFeed(Long userID) {
-        return followRepository.findAll().stream().filter(e -> e.getFollowerUser().getUserID().equals(userID)).map(e -> e.getFollowedUser().getPosts()).toList();
+
+        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
+        return userRepository.getReferenceById(userID).getFollows().stream().map(Follow::getFollowedUser).map(User::getPosts).toList();
     }
 }
