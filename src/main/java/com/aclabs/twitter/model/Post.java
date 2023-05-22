@@ -34,6 +34,10 @@ public @Data class Post {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Like> postLikes;
 
+    @JsonManagedReference(value = "Post replies")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentPost", cascade = CascadeType.REMOVE)
+    private List<Reply> replies;
+
     public Post(Long id) {
         this.id =  id;
     }
