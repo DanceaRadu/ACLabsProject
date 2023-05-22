@@ -21,17 +21,16 @@ public @Data class Like {
         private Long postID;
 
         public LikeID() {
-
         }
 
-        public LikeID(Long likerUsername, Long postID) {
-            this.likerID = likerUsername;
+        public LikeID(Long likerID, Long postID) {
+            this.likerID = likerID;
             this.postID = postID;
         }
 
-        public Long getLikerUsername() {
+        public Long getLikerID() {
             return likerID; }
-        public void setLikerUsername(Long likerID) {
+        public void setLikerID(Long likerID) {
             this.likerID= likerID;
         }
 
@@ -50,6 +49,11 @@ public @Data class Like {
             }
             return false;
         }
+
+        @Override
+        public int hashCode(){
+            return (int)(likerID + postID);
+        }
    }
 
     @EmbeddedId
@@ -58,10 +62,10 @@ public @Data class Like {
     @JsonBackReference(value = "Post Likes")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", insertable=false, updatable=false)
-    Post post;
+    private Post post;
 
     @JsonBackReference(value = "User likes")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "liker_id", insertable=false, updatable=false)
-    User liker;
+    private User liker;
 }

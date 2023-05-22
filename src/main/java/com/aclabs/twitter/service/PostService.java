@@ -1,5 +1,6 @@
 package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.exceptionhandling.exceptions.PostNotFoundException;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,10 @@ public class PostService {
 
     public void post(Post post) {
         postRepository.save(post);
+    }
+    public void deletePost(Long postID) {
+        if(!postRepository.existsById(postID)) throw new PostNotFoundException(postID);
+        else postRepository.deleteById(postID);
     }
 
 }

@@ -3,18 +3,18 @@ package com.aclabs.twitter.controller;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.service.UserService;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/v1/user")
+@RequestMapping(path = "api/v1.1/user")
 public class UserController {
 
     private final UserService userService;
@@ -24,29 +24,50 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Register a new user and add him to the database")
     @PostMapping(path = "register")
     public void register(@RequestBody User user) {
         userService.register(user);
     }
 
+    @Operation(summary = "Search users by their last names, first names or usernames",
+            responses = {
+                    @ApiResponse(description = "The user",
+                        content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "404", description = "No users were found")})
     @GetMapping
-    public List<User> search(@RequestParam String searchTerm) {
-        return userService.search(searchTerm);
+    public List<User> search(@RequestParam String query) {
+       return userService.search(query);
     }
-
-    @DeleteMapping
-    public void unregister(@RequestParam Long userID) {
+    @Operation(summary = "Delete a user with a given ID from the database",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User was deleted"),
+                    @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
+    @DeleteMapping(path = "{userID}")
+    public void unregister(@PathVariable Long userID) {
         userService.unregister(userID);
     }
 
+    @Operation(summary = "Get all of the posts of a user based on his ID",
+            responses = {
+                    @ApiResponse(description = "The posts",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Post.class))),
+                    @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/posts")
     public List<Post> getOwnPosts(@PathVariable Long userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
         return userService.getOwnPosts(userID, filterTime);
     }
 
+    @Operation(summary = "Get a user's feed based on his ID",
+            responses = {
+                    @ApiResponse(description = "The posts",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Post.class))),
+                    @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/feed")
     public List<List<Post>> getFollowedPosts(@PathVariable Long userID) {
         return userService.getFeed(userID);
     }
-
 }
