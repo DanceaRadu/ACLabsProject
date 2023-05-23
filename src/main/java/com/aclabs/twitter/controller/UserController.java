@@ -1,5 +1,6 @@
 package com.aclabs.twitter.controller;
 
+import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.service.UserService;
@@ -68,7 +69,7 @@ public class UserController {
                                     schema = @Schema(implementation = Post.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/feed")
-    public List<List<Post>> getFollowedPosts(@PathVariable UUID userID) {
+    public List<List<PostGetDTO>> getFollowedPosts(@PathVariable UUID userID) {
         return userService.getFeed(userID);
     }
 }

@@ -2,6 +2,8 @@ package com.aclabs.twitter.service;
 
 import com.aclabs.twitter.exceptionhandling.exceptions.NoQueryResultException;
 import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
+import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
+import com.aclabs.twitter.mapstruct.mappers.PostGetMapper;
 import com.aclabs.twitter.model.Follow;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.repository.FollowRepository;
@@ -24,11 +26,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final PostGetMapper postGetMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, PostGetMapper postGetMapper) {
         this.userRepository =  userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.postGetMapper = postGetMapper;
     }
 
     public void register(User user) {
@@ -58,9 +62,11 @@ public class UserService {
             return userRepository.getReferenceById(userID).getPosts();
     }
 
-    public List<List<Post>> getFeed(UUID userID) {
+    public List<List<PostGetDTO>> getFeed(UUID userID) {
 
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
-        return userRepository.getReferenceById(userID).getFollows().stream().map(Follow::getFollowedUser).map(User::getPosts).toList();
+        return userRepository.getReferenceById(userID).getFollows().stream().map(Follow::getFollowedUser).map(
+                e -> e.getPosts().stream().map(i -> postGetMapper.postToPostGetDTO(i)).toList()
+        ).toList();
     }
 }
