@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "replies")
@@ -13,8 +14,8 @@ public @Data class Reply {
 
     @Id
     @Column(name = "reply_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long replyID;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID replyID;
 
     @Column(name = "reply_text", nullable = false)
     private String replyText;
@@ -30,4 +31,9 @@ public @Data class Reply {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_post_id", referencedColumnName = "post_id")
     private Post parentPost;
+
+    @JsonBackReference(value = "Replier")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User replier;
 }

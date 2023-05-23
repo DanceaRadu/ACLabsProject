@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "api/v1.1/post")
 public class PostController {
@@ -29,7 +31,7 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "No post was found for the given id")
     })
     @DeleteMapping(path = "{postID}")
-    public void deletePost(@PathVariable Long postID) {
+    public void deletePost(@PathVariable UUID postID) {
         postService.deletePost(postID);
     }
 

@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1.1/user")
@@ -45,7 +46,7 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "User was deleted"),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @DeleteMapping(path = "{userID}")
-    public void unregister(@PathVariable Long userID) {
+    public void unregister(@PathVariable UUID userID) {
         userService.unregister(userID);
     }
 
@@ -56,7 +57,7 @@ public class UserController {
                                     schema = @Schema(implementation = Post.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/posts")
-    public List<Post> getOwnPosts(@PathVariable Long userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
+    public List<Post> getOwnPosts(@PathVariable UUID userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
         return userService.getOwnPosts(userID, filterTime);
     }
 
@@ -67,7 +68,7 @@ public class UserController {
                                     schema = @Schema(implementation = Post.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/feed")
-    public List<List<Post>> getFollowedPosts(@PathVariable Long userID) {
+    public List<List<Post>> getFollowedPosts(@PathVariable UUID userID) {
         return userService.getFeed(userID);
     }
 }

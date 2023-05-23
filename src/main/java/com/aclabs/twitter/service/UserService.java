@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -43,12 +44,12 @@ public class UserService {
         else return list;
     }
 
-    public void unregister(Long userID) {
+    public void unregister(UUID userID) {
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         userRepository.deleteById(userID);
     }
 
-    public List<Post> getOwnPosts(Long userID, Date filterTime) {
+    public List<Post> getOwnPosts(UUID userID, Date filterTime) {
 
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         if(filterTime != null)
@@ -57,7 +58,7 @@ public class UserService {
             return userRepository.getReferenceById(userID).getPosts();
     }
 
-    public List<List<Post>> getFeed(Long userID) {
+    public List<List<Post>> getFeed(UUID userID) {
 
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         return userRepository.getReferenceById(userID).getFollows().stream().map(Follow::getFollowedUser).map(User::getPosts).toList();
