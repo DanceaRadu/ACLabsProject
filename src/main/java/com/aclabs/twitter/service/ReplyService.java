@@ -1,6 +1,6 @@
 package com.aclabs.twitter.service;
 
-import com.aclabs.twitter.repository.PostRepository;
+import com.aclabs.twitter.model.Reply;
 import com.aclabs.twitter.repository.ReplyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,4 +14,7 @@ public class ReplyService {
         this.replyRepository = replyRepository;
     }
 
+    public void addReply(Reply reply) {
+        replyRepository.save(reply);
+    }
 }

@@ -1,10 +1,12 @@
 package com.aclabs.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name="users")
@@ -23,6 +25,7 @@ public @Data class User {
     @Column(name="email", nullable=false)
     private String email;
     @Column(name="password", length=100, nullable=false)
+    @JsonIgnore
     private String password;
 
     @JsonManagedReference (value = "User posts")
