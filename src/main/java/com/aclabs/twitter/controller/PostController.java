@@ -1,5 +1,6 @@
 package com.aclabs.twitter.controller;
 
+import com.aclabs.twitter.mapstruct.DTO.RepostDTO;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,5 +36,8 @@ public class PostController {
         postService.deletePost(postID);
     }
 
-    //@PostMapping(path = "{postID}")
+    @PostMapping(path = "repost")
+    public void repost(@RequestBody RepostDTO repost) {
+        postService.repost(repost);
+    }
 }

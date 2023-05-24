@@ -3,49 +3,48 @@ package com.aclabs.twitter.service;
 import com.aclabs.twitter.exceptionhandling.exceptions.NoQueryResultException;
 import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
 import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
-import com.aclabs.twitter.mapstruct.mappers.PostGetMapper;
+import com.aclabs.twitter.mapstruct.DTO.UserSearchDTO;
+import com.aclabs.twitter.mapstruct.mappers.DTOMapper;
 import com.aclabs.twitter.model.Follow;
 import com.aclabs.twitter.model.User;
-import com.aclabs.twitter.repository.FollowRepository;
 import com.aclabs.twitter.model.Post;
+import com.aclabs.twitter.repository.PostRepository;
 import com.aclabs.twitter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final PostGetMapper postGetMapper;
+    private final DTOMapper DTOMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, PostGetMapper postGetMapper) {
+    public UserService(UserRepository userRepository, PostRepository postRepository, BCryptPasswordEncoder passwordEncoder, DTOMapper DTOMapper) {
         this.userRepository =  userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.postGetMapper = postGetMapper;
+        this.DTOMapper = DTOMapper;
+        this.postRepository = postRepository;
     }
 
     public void register(User user) {
-        System.out.println(user.getPassword());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
     }
 
-    public List<User> search(String searchTerm) {
+    public List<UserSearchDTO> search(String searchTerm) {
         List<User> list =  userRepository.findUsersByUsernameContainsOrFirstNameContainsOrLastNameContains(searchTerm, searchTerm, searchTerm);
         if(list.isEmpty()) throw new NoQueryResultException(searchTerm);
-        else return list;
+
+        return list.stream().map(DTOMapper::userToUserSearchDTO).toList();
     }
 
     public void unregister(UUID userID) {
@@ -53,20 +52,29 @@ public class UserService {
         userRepository.deleteById(userID);
     }
 
-    public List<Post> getOwnPosts(UUID userID, Date filterTime) {
-
+    public List<PostGetDTO> getOwnPosts(UUID userID, Timestamp filterTime) {
+        List<Post> postList;
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         if(filterTime != null)
-            return userRepository.getReferenceById(userID).getPosts().stream().filter(e -> e.getPostDate().after(filterTime)).toList();
+            postList = postRepository.getPostByPoster_UserIDAndPostDateAfter(userID, filterTime);
         else
-            return userRepository.getReferenceById(userID).getPosts();
+            postList = postRepository.getPostByPoster_UserID(userID);
+        return postList.stream().map(DTOMapper::postToPostGetDTO).toList();
     }
 
     public List<List<PostGetDTO>> getFeed(UUID userID) {
-
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
-        return userRepository.getReferenceById(userID).getFollows().stream().map(Follow::getFollowedUser).map(
-                e -> e.getPosts().stream().map(i -> postGetMapper.postToPostGetDTO(i)).toList()
+        return userRepository
+                .getReferenceById(userID)
+                .getFollows().stream()
+                .map(Follow::getFollowedUser)
+                .map(e -> e.getPosts().stream().map(DTOMapper::postToPostGetDTO).toList()
         ).toList();
+    }
+
+    public List<PostGetDTO> getMentions(UUID userID) {
+        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
+        String username = userRepository.getReferenceById(userID).getUsername();
+        return postRepository.getPostByMessageContains(username).stream().map(DTOMapper::postToPostGetDTO).toList();
     }
 }

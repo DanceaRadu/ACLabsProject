@@ -1,7 +1,7 @@
 package com.aclabs.twitter.controller;
 
 import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
-import com.aclabs.twitter.model.Post;
+import com.aclabs.twitter.mapstruct.DTO.UserSearchDTO;
 import com.aclabs.twitter.model.User;
 import com.aclabs.twitter.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -36,10 +38,10 @@ public class UserController {
             responses = {
                     @ApiResponse(description = "The user",
                         content = @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = User.class))),
+                        schema = @Schema(implementation = UserSearchDTO.class))),
                     @ApiResponse(responseCode = "404", description = "No users were found")})
     @GetMapping
-    public List<User> search(@RequestParam String query) {
+    public List<UserSearchDTO> search(@RequestParam String query) {
        return userService.search(query);
     }
     @Operation(summary = "Delete a user with a given ID from the database",
@@ -55,21 +57,32 @@ public class UserController {
             responses = {
                     @ApiResponse(description = "The posts",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Post.class))),
+                                    schema = @Schema(implementation = PostGetDTO.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/posts")
-    public List<Post> getOwnPosts(@PathVariable UUID userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
-        return userService.getOwnPosts(userID, filterTime);
+    public List<PostGetDTO> getOwnPosts(@PathVariable UUID userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
+        return userService.getOwnPosts(userID, new Timestamp(filterTime.getTime()));
     }
 
     @Operation(summary = "Get a user's feed based on his ID",
             responses = {
                     @ApiResponse(description = "The posts",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Post.class))),
+                                    schema = @Schema(implementation = PostGetDTO.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/feed")
     public List<List<PostGetDTO>> getFollowedPosts(@PathVariable UUID userID) {
         return userService.getFeed(userID);
+    }
+
+    @Operation(summary = "Get the posts in which a user was mentioned",
+            responses = {
+                @ApiResponse(description = "The posts",
+                        content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PostGetDTO.class))),
+                @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
+    @GetMapping(path = "{userID}/mentions")
+    public List<PostGetDTO> getMentions(@PathVariable UUID userID) {
+        return userService.getMentions(userID);
     }
 }
