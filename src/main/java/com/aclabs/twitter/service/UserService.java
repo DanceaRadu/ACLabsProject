@@ -3,6 +3,7 @@ package com.aclabs.twitter.service;
 import com.aclabs.twitter.exceptionhandling.exceptions.NoQueryResultException;
 import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
 import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
+import com.aclabs.twitter.mapstruct.DTO.ReplyGetDTO;
 import com.aclabs.twitter.mapstruct.DTO.UserSearchDTO;
 import com.aclabs.twitter.mapstruct.mappers.DTOMapper;
 import com.aclabs.twitter.model.Follow;
@@ -15,8 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -52,11 +52,11 @@ public class UserService {
         userRepository.deleteById(userID);
     }
 
-    public List<PostGetDTO> getOwnPosts(UUID userID, Timestamp filterTime) {
+    public List<PostGetDTO> getOwnPosts(UUID userID, Optional<Date> filterTime) {
         List<Post> postList;
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
-        if(filterTime != null)
-            postList = postRepository.getPostByPoster_UserIDAndPostDateAfter(userID, filterTime);
+        if(filterTime.isPresent())
+            postList = postRepository.getPostByPoster_UserIDAndPostDateAfter(userID, new Timestamp(filterTime.get().getTime()));
         else
             postList = postRepository.getPostByPoster_UserID(userID);
         return postList.stream().map(DTOMapper::postToPostGetDTO).toList();
@@ -64,12 +64,18 @@ public class UserService {
 
     public List<List<PostGetDTO>> getFeed(UUID userID) {
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
-        return userRepository
+        List<List<PostGetDTO>> list =  userRepository
                 .getReferenceById(userID)
                 .getFollows().stream()
                 .map(Follow::getFollowedUser)
                 .map(e -> e.getPosts().stream().map(DTOMapper::postToPostGetDTO).toList()
         ).toList();
+
+        for(List<PostGetDTO> postList: list )
+            for(PostGetDTO post : postList)
+                post.setReplies(post.getReplies().stream().filter(ReplyGetDTO::isPublic).toList());
+
+        return list;
     }
 
     public List<PostGetDTO> getMentions(UUID userID) {

@@ -9,4 +9,5 @@ public @Data class ReplyGetDTO {
     private String replyText;
     private String replierUsername;
     private Timestamp postDate;
+    private boolean isPublic;
 }

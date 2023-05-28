@@ -1,9 +1,7 @@
 package com.aclabs.twitter.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import java.util.List;
 import java.util.UUID;

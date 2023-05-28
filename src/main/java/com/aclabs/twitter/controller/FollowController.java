@@ -20,7 +20,12 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @Operation(summary = "Create a follow relationship between 2 users")
+    @Operation(summary = "Create a follow relationship between 2 users",
+    responses = {
+            @ApiResponse(responseCode = "200", description = "Follow relation created"),
+            @ApiResponse(responseCode = "404", description = "One of the users doesn't exist"),
+            @ApiResponse(responseCode = "400", description = "Bad request, a user cannot follow themselves")
+    })
     @PostMapping
     public void follow(@RequestBody Follow f) {
         followService.follow(f);

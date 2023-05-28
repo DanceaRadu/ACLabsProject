@@ -1,7 +1,7 @@
 package com.aclabs.twitter.controller;
 
+import com.aclabs.twitter.mapstruct.DTO.PostNoDateDTO;
 import com.aclabs.twitter.mapstruct.DTO.RepostDTO;
-import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +23,7 @@ public class PostController {
 
     @Operation(summary = "Posts a message to the app")
     @PostMapping
-    public void post(@RequestBody Post post) {
+    public void post(@RequestBody PostNoDateDTO post) {
         postService.post(post);
     }
 
