@@ -4,14 +4,16 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "follows")
 public @Data class Follow {
 
     @Id
     @Column(name = "follow_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long followID;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID followID;
 
     @JsonBackReference(value = "User followers")
     @ManyToOne(fetch = FetchType.LAZY)

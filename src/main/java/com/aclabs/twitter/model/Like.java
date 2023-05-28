@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 
 @Entity
@@ -16,29 +17,29 @@ public @Data class Like {
     public static class LikeID implements Serializable{
 
         @Column(name = "liker_id", nullable = false)
-        private Long likerID;
+        private UUID likerID;
         @Column(name = "post_id", nullable = false)
-        private Long postID;
+        private UUID postID;
 
         public LikeID() {
         }
 
-        public LikeID(Long likerID, Long postID) {
+        public LikeID(UUID likerID, UUID postID) {
             this.likerID = likerID;
             this.postID = postID;
         }
 
-        public Long getLikerID() {
+        public UUID getLikerID() {
             return likerID; }
-        public void setLikerID(Long likerID) {
+        public void setLikerID(UUID likerID) {
             this.likerID= likerID;
         }
 
-        public Long getPostID() {
+        public UUID getPostID() {
             return postID;
         }
 
-        public void setPostID(Long postID) {
+        public void setPostID(UUID postID) {
             this.postID = postID;
         }
 
@@ -52,7 +53,7 @@ public @Data class Like {
 
         @Override
         public int hashCode(){
-            return (int)(likerID + postID);
+            return likerID.hashCode() + postID.hashCode();
         }
    }
 

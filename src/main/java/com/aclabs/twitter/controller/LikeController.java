@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("api/v1.1/like")
 public class LikeController {
@@ -29,7 +31,7 @@ public class LikeController {
             @ApiResponse(responseCode = "404", description = "User id and/or post id are invalid")
         })
     @DeleteMapping(path = "{userID}/{postID}")
-    public void removeLike(@PathVariable Long userID, @PathVariable Long postID) {
+    public void removeLike(@PathVariable UUID userID, @PathVariable UUID postID) {
         likeService.removeLike(userID, postID);
     }
 }

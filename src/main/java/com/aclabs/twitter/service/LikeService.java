@@ -10,6 +10,8 @@ import com.aclabs.twitter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class LikeService {
 
@@ -28,7 +30,7 @@ public class LikeService {
         likeRepository.save(l);
     }
 
-    public void removeLike(Long userID, Long postID) {
+    public void removeLike(UUID userID, UUID postID) {
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         if(!postRepository.existsById(postID)) throw new PostNotFoundException(postID);
 

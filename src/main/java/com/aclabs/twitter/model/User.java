@@ -1,10 +1,12 @@
 package com.aclabs.twitter.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name="users")
@@ -12,8 +14,8 @@ public @Data class User {
 
     @Id
     @Column(name = "user_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userID;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID userID;
     @Column(name="username", nullable = false, unique = true)
     private String username;
     @Column(name="first_name",  nullable=false)
@@ -41,7 +43,11 @@ public @Data class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "liker", cascade = CascadeType.REMOVE)
     private List<Like> likedPosts;
 
-    public User(Long userID) {
+    @JsonManagedReference (value = "Replier")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "replier", cascade = CascadeType.REMOVE)
+    private List<Reply> replies;
+
+    public User(UUID userID) {
         this.userID = userID;
     }
     public User() {}

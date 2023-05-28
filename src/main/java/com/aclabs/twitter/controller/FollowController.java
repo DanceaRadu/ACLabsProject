@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "api/v1.1/follow")
 public class FollowController {
@@ -29,7 +31,7 @@ public class FollowController {
             @ApiResponse(responseCode = "404", description = "No follow relation was found between the two users")
     })
     @DeleteMapping(path = "{userID}/{unfollowedUserID}")
-    public void unfollow(@PathVariable long userID, @PathVariable long unfollowedUserID) {
+    public void unfollow(@PathVariable UUID userID, @PathVariable UUID unfollowedUserID) {
         followService.unfollow(userID, unfollowedUserID);
     }
 }

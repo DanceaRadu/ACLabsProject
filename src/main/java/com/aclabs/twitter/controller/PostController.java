@@ -1,11 +1,14 @@
 package com.aclabs.twitter.controller;
 
+import com.aclabs.twitter.mapstruct.DTO.RepostDTO;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1.1/post")
@@ -29,7 +32,12 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "No post was found for the given id")
     })
     @DeleteMapping(path = "{postID}")
-    public void deletePost(@PathVariable Long postID) {
+    public void deletePost(@PathVariable UUID postID) {
         postService.deletePost(postID);
+    }
+
+    @PostMapping(path = "repost")
+    public void repost(@RequestBody RepostDTO repost) {
+        postService.repost(repost);
     }
 }
