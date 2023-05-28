@@ -58,4 +58,13 @@ public class AppAdvice extends ResponseEntityExceptionHandler {
         body.put("status", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
+
+    @ResponseBody
+    @ExceptionHandler(InvalidFollowException.class)
+    public ResponseEntity<Object> invalidFollowExceptionHandler(InvalidFollowException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", e.getMessage());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

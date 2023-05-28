@@ -15,7 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,11 +54,11 @@ public class UserService {
         userRepository.deleteById(userID);
     }
 
-    public List<PostGetDTO> getOwnPosts(UUID userID, Timestamp filterTime) {
+    public List<PostGetDTO> getOwnPosts(UUID userID, Optional<Date> filterTime) {
         List<Post> postList;
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
-        if(filterTime != null)
-            postList = postRepository.getPostByPoster_UserIDAndPostDateAfter(userID, filterTime);
+        if(filterTime.isPresent())
+            postList = postRepository.getPostByPoster_UserIDAndPostDateAfter(userID, new Timestamp(filterTime.get().getTime()));
         else
             postList = postRepository.getPostByPoster_UserID(userID);
         return postList.stream().map(DTOMapper::postToPostGetDTO).toList();

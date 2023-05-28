@@ -27,6 +27,7 @@ public class LikeService {
     }
 
     public void like(Like l) {
+        if(!postRepository.existsById(l.getPost().getId())) throw new PostNotFoundException(l.getPost().getId());
         likeRepository.save(l);
     }
 

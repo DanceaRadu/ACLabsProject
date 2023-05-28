@@ -2,7 +2,9 @@ package com.aclabs.twitter.service;
 
 import com.aclabs.twitter.exceptionhandling.exceptions.PostNotFoundException;
 import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
+import com.aclabs.twitter.mapstruct.DTO.PostNoDateDTO;
 import com.aclabs.twitter.mapstruct.DTO.RepostDTO;
+import com.aclabs.twitter.mapstruct.mappers.DTOMapper;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.repository.PostRepository;
 import com.aclabs.twitter.repository.UserRepository;
@@ -18,16 +20,19 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final DTOMapper mapper;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, DTOMapper mapper) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.mapper = mapper;
     }
 
-    public void post(Post post) {
-        System.out.println("here");
-        if(!userRepository.existsById(post.getPoster().getUserID())) throw new UserNotFoundException(post.getPoster().getUserID());
+    public void post(PostNoDateDTO postNoDate) {
+        if(!userRepository.existsById(postNoDate.getPoster().getUserID())) throw new UserNotFoundException(postNoDate.getPoster().getUserID());
+        Post post = mapper.postNoDateDTOToPost(postNoDate);
+        post.setPostDate(new Timestamp(new Date().getTime()));
         postRepository.save(post);
     }
     public void deletePost(UUID postID) {
@@ -43,8 +48,7 @@ public class PostService {
         Post oldPost = postRepository.getReferenceById(repost.getPostID());
         newPost.setPostDate(new Timestamp(new Date().getTime()));
         newPost.setPoster(userRepository.getReferenceById(repost.getReposterID()));
-        newPost.setMessage(oldPost.getMessage());
+        newPost.setMessage("Repost: " + oldPost.getMessage());
         postRepository.save(newPost);
     }
-
 }

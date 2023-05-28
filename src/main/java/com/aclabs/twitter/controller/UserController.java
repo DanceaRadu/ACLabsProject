@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -60,8 +60,8 @@ public class UserController {
                                     schema = @Schema(implementation = PostGetDTO.class))),
                     @ApiResponse(responseCode = "404", description = "No user was found for the given id")})
     @GetMapping(path = "{userID}/posts")
-    public List<PostGetDTO> getOwnPosts(@PathVariable UUID userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date filterTime) {
-        return userService.getOwnPosts(userID, new Timestamp(filterTime.getTime()));
+    public List<PostGetDTO> getOwnPosts(@PathVariable UUID userID, @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Optional<Date> filterTime) {
+        return userService.getOwnPosts(userID, filterTime);
     }
 
     @Operation(summary = "Get a user's feed based on his ID",

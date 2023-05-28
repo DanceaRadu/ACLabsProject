@@ -1,9 +1,6 @@
 package com.aclabs.twitter.mapstruct.mappers;
 
-import com.aclabs.twitter.mapstruct.DTO.LikeGetDTO;
-import com.aclabs.twitter.mapstruct.DTO.PostGetDTO;
-import com.aclabs.twitter.mapstruct.DTO.ReplyGetDTO;
-import com.aclabs.twitter.mapstruct.DTO.UserSearchDTO;
+import com.aclabs.twitter.mapstruct.DTO.*;
 import com.aclabs.twitter.model.Like;
 import com.aclabs.twitter.model.Post;
 import com.aclabs.twitter.model.Reply;
@@ -26,5 +23,7 @@ public interface DTOMapper {
     LikeGetDTO likeToLikeGetDTO(Like like);
 
     UserSearchDTO userToUserSearchDTO(User user);
+
+    Post postNoDateDTOToPost(PostNoDateDTO post);
 
 }
