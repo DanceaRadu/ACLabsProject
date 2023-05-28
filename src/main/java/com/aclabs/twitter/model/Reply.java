@@ -21,7 +21,7 @@ public @Data class Reply {
     private String replyText;
 
     @Column(name = "public", nullable = false)
-    private boolean isPublic;
+    private boolean isPublic = true;
 
     @Column(name = "reply_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
