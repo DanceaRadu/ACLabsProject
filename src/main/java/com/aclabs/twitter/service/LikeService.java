@@ -28,12 +28,13 @@ public class LikeService {
 
     public void like(Like l) {
         if(!postRepository.existsById(l.getPost().getId())) throw new PostNotFoundException(l.getPost().getId());
+        if(!userRepository.existsById(l.getLiker().getUserID())) throw new UserNotFoundException(l.getLiker().getUserID());
         likeRepository.save(l);
     }
 
     public void removeLike(UUID userID, UUID postID) {
-        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
         if(!postRepository.existsById(postID)) throw new PostNotFoundException(postID);
+        if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
 
         Like.LikeID id = new Like.LikeID(userID, postID);
         if(!likeRepository.existsById(id)) throw new LikeNotFoundException(userID, postID);
