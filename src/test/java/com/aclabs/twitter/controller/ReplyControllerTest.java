@@ -19,6 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,11 +36,20 @@ public class ReplyControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private ReplyService replyService;
+    private String apiVersion;
 
     @BeforeEach
     public void setup() {
         ReplyController replyController = new ReplyController(replyService);
         mockMvc = MockMvcBuilders.standaloneSetup(replyController).setControllerAdvice(new AppAdvice()).build();
+
+        try (InputStream input = new FileInputStream("src/test/resources/test.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            apiVersion = prop.getProperty("api-version");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Test
@@ -51,14 +64,14 @@ public class ReplyControllerTest {
         reply.setReplier(user);
         reply.setParentPost(post);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1.1/reply")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/" + apiVersion + "/reply")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(reply)))
                 .andExpect(status().isOk());
 
         Mockito.doThrow(new UserNotFoundException(userUUID)).when(replyService).addReply(any(Reply.class));
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1.1/reply")
+                        .post("/api/" + apiVersion + "/reply")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(reply)))
                 .andExpect(status().isNotFound())
@@ -67,7 +80,7 @@ public class ReplyControllerTest {
 
         Mockito.doThrow(new PostNotFoundException(postUUID)).when(replyService).addReply(any(Reply.class));
         mockMvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1.1/reply")
+                        .post("/api/" + apiVersion + "/reply")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(reply)))
                 .andExpect(status().isNotFound())

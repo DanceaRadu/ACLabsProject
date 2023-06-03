@@ -19,6 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,11 +33,20 @@ public class UserControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private UserService userService;
+    private String apiVersion;
 
     @BeforeEach
     public void setup() {
         UserController userController = new UserController(userService);
         mockMvc = MockMvcBuilders.standaloneSetup(userController).setControllerAdvice(new AppAdvice()).build();
+
+        try (InputStream input = new FileInputStream("src/test/resources/test.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            apiVersion = prop.getProperty("api-version");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Test
@@ -45,7 +57,7 @@ public class UserControllerTest {
         user.setFirstName("Radu");
         user.setLastName("Dancea");
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1.1/user/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/" + apiVersion + "/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(user)))
                 .andExpect(status().isOk());
@@ -62,7 +74,7 @@ public class UserControllerTest {
 
         Mockito.when(userService.search("Go")).thenReturn(users);
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1.1/user?query=Go").accept(MediaType.APPLICATION_JSON))
+                .get("/api/" + apiVersion + "/user?query=Go").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].username").value("GoNemesis"))
@@ -70,7 +82,7 @@ public class UserControllerTest {
 
         Mockito.when(userService.search("NoResult")).thenThrow(new NoQueryResultException("NoResult"));
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1.1/user?query=NoResult"))
+                .get("/api/" + apiVersion + "/user?query=NoResult"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("error").value("The search using the query = 'NoResult' didn't return any results"))
                 .andExpect(jsonPath("status").value("NOT_FOUND"));
@@ -84,11 +96,11 @@ public class UserControllerTest {
         Mockito.doThrow(new UserNotFoundException(wrongID)).when(userService).unregister(wrongID);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .delete("/api/v1.1/user/" + userID))
+                .delete("/api/" + apiVersion + "/user/" + userID))
                 .andExpect(status().isOk());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1.1/user/" + wrongID))
+                        .delete("/api/" + apiVersion + "/user/" + wrongID))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("error").value("User with id: " + wrongID + " was not found"))
                 .andExpect(jsonPath("status").value("NOT_FOUND"));
@@ -112,7 +124,7 @@ public class UserControllerTest {
         Mockito.when(userService.getOwnPosts(wrongID, java.util.Optional.empty())).thenThrow(new UserNotFoundException(wrongID));
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1.1/user/" + userUUID + "/posts")
+                .get("/api/" + apiVersion + "/user/" + userUUID + "/posts")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -120,7 +132,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1].message").value("Testing the getOwnPosts method"));
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/api/v1.1/user/" + wrongID + "/posts"))
+                .get("/api/" + apiVersion + "/user/" + wrongID + "/posts"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("error").value("User with id: " + wrongID + " was not found"))
                 .andExpect(jsonPath("status").value("NOT_FOUND"));
@@ -146,7 +158,7 @@ public class UserControllerTest {
         Mockito.when(userService.getFeed(wrongID)).thenThrow(new UserNotFoundException(wrongID));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1.1/user/" + userID + "/feed")
+                        .get("/api/" + apiVersion + "/user/" + userID + "/feed")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -156,7 +168,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1][1].message").value("This is a test message"));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1.1/user/" + wrongID + "/feed"))
+                        .get("/api/" + apiVersion + "/user/" + wrongID + "/feed"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("error").value("User with id: " + wrongID + " was not found"))
                 .andExpect(jsonPath("status").value("NOT_FOUND"));
@@ -179,7 +191,7 @@ public class UserControllerTest {
         Mockito.when(userService.getMentions(wrongID)).thenThrow(new UserNotFoundException(wrongID));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1.1/user/" + userID + "/mentions")
+                        .get("/api/" + apiVersion + "/user/" + userID + "/mentions")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -187,7 +199,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1].message").value("GoNemesis sucks"));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/v1.1/user/" + wrongID + "/mentions"))
+                        .get("/api/" + apiVersion + "/user/" + wrongID + "/mentions"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("error").value("User with id: " + wrongID + " was not found"))
                 .andExpect(jsonPath("status").value("NOT_FOUND"));
