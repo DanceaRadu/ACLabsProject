@@ -24,7 +24,7 @@ public @Data class Reply {
     private boolean isPublic = true;
 
     @Column(name = "reply_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Bucharest")
     private Timestamp postDate;
 
     @JsonBackReference(value = "Post replies")

@@ -1,5 +1,6 @@
 package com.aclabs.twitter.service;
 
+import com.aclabs.twitter.exceptionhandling.exceptions.DuplicateLikeException;
 import com.aclabs.twitter.exceptionhandling.exceptions.LikeNotFoundException;
 import com.aclabs.twitter.exceptionhandling.exceptions.PostNotFoundException;
 import com.aclabs.twitter.exceptionhandling.exceptions.UserNotFoundException;
@@ -27,12 +28,14 @@ public class LikeService {
     }
 
     public void like(Like l) {
-        if(!postRepository.existsById(l.getPost().getId())) throw new PostNotFoundException(l.getPost().getId());
-        if(!userRepository.existsById(l.getLiker().getUserID())) throw new UserNotFoundException(l.getLiker().getUserID());
+        if(likeRepository.getLikeByLikeID(l.getLikeID()).isPresent()) throw new DuplicateLikeException();
+        if(!postRepository.existsById(l.getLikeID().getPostID())) throw new PostNotFoundException(l.getPost().getId());
+        if(!userRepository.existsById(l.getLikeID().getLikerID())) throw new UserNotFoundException(l.getLiker().getUserID());
         likeRepository.save(l);
     }
 
     public void removeLike(UUID userID, UUID postID) {
+
         if(!postRepository.existsById(postID)) throw new PostNotFoundException(postID);
         if(!userRepository.existsById(userID)) throw new UserNotFoundException(userID);
 

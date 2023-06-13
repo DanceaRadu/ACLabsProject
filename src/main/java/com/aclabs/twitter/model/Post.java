@@ -28,7 +28,7 @@ public @Data class Post {
     private String message;
 
     @Column(name = "post_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Europe/Bucharest")
     private Timestamp postDate;
 
     @JsonManagedReference(value = "Post Likes")
