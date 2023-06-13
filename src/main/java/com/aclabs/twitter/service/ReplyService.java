@@ -9,6 +9,9 @@ import com.aclabs.twitter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Service
 public class ReplyService {
     private final ReplyRepository replyRepository;
@@ -25,6 +28,7 @@ public class ReplyService {
     public void addReply(Reply reply) {
         if(!postRepository.existsById(reply.getParentPost().getId())) throw new PostNotFoundException(reply.getParentPost().getId());
         if(!userRepository.existsById(reply.getReplier().getUserID())) throw new UserNotFoundException(reply.getReplier().getUserID());
+        reply.setPostDate(new Timestamp(new Date().getTime()));
         replyRepository.save(reply);
     }
 }

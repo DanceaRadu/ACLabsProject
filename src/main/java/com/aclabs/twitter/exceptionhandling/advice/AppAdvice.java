@@ -67,4 +67,13 @@ public class AppAdvice extends ResponseEntityExceptionHandler {
         body.put("status", HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseBody
+    @ExceptionHandler(DuplicateLikeException.class)
+    public ResponseEntity<Object> duplicateLikeExceptionHandler(DuplicateLikeException e) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("error", e.getMessage());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }
